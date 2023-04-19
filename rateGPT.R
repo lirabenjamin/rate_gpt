@@ -1,4 +1,28 @@
+#' Use ChatGPT to rate a text for some psychological phenomenon.
+#'
+#' @param input_text The text you would like to rate
+#' @param prompt The prompt you want to give GPT so that it rates the text
+#' @param openai_token Your API token
+#' @param number logical, TRUE if you just want a number rather than a character. Useful if you don't want explanations. Defaults to TRUE.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' # Example (single text)
+#' input_text <- "Througout my college career I had to work so hard to achieve what I've wanted. I never gave up and finally was able to graduate. It wasn't easy, but I truly believe that overcoming those obstacles has made me a stronger candidate."
+#' prompt <- "Please rate the text on a scale from 0 to 100, where 0 means no perseverance, and 100 means high perseverance. You can use any number between 0 and 100, Just respond with the number, you don't need to give explanations."
+#' openai_token <- "your_token_here"
+#' openai_token <- read_lines("secret")
+#' result <- chat_gpt(input_text, prompt, openai_token)
+#' cat("GPT-3.5-turbo completion:", result)
+#' # Example (dataframe)
+#' enframe(input_text) |>  
+#' rename(id = name, text = value) |>  
+#' mutate(perseverance = map_dbl(text, ~chat_gpt(., prompt, openai_token) ))
+#' 
 rate_gpt <- function(input_text, prompt, openai_token, number = T) {
+  
   require(httr)
 
   # Set up API call
@@ -41,17 +65,3 @@ rate_gpt <- function(input_text, prompt, openai_token, number = T) {
     return(paste("Error: HTTP status code", response$status_code))
   }
 }
-
-# Example (single text)
-input_text <- "Througout my college career I had to work so hard to achieve what I've wanted. I never gave up and finally was able to graduate. It wasn't easy, but I truly believe that overcoming those obstacles has made me a stronger candidate."
-prompt <- "Please rate the text on a scale from 0 to 100, where 0 means no perseverance, and 100 means high perseverance. You can use any number between 0 and 100, Just respond with the number, you don't need to give explanations."
-openai_token <- "your_token_here"
-openai_token <- read_lines("secret")
-
-result <- chat_gpt(input_text, prompt, openai_token)
-cat("GPT-3.5-turbo completion:", result)
-
-# Example (dataframe)
-enframe(input_text) |>  
-  rename(id = name, text = value) |>  
-  mutate(perseverance = map_dbl(text, ~chat_gpt(., prompt, openai_token) ))
